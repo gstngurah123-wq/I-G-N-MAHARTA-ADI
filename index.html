@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Maya Matematika - SDN 2 Ubud</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Fredoka for fun headers -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            overflow: hidden;
+            background-color: #0f172a;
+        }
+        .font-fredoka {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+        /* Strict 16:9 Container styling */
+        .aspect-16-9-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 177.78vh; /* 16:9 Aspect Ratio Lock */
+            max-height: 56.25vw;
+            margin: auto;
+            position: absolute;
+            top: 0; bottom: 0; left: 0; right: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        /* Custom Scrollbar for tab content if content stretches in ultra small screens */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 8px;
+        }
+        /* Tab transitions */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .tab-content.active {
+            display: flex;
+            opacity: 1;
+        }
+        /* Pulse Animation for highlight */
+        @keyframes subtle-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .animate-pulse-subtle {
+            animation: subtle-pulse 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-800 flex items-center justify-center min-h-screen p-0 m-0">
+
+    <!-- MAIN 16:9 FULLSCREEN APP CONTAINER -->
+    <div class="aspect-16-9-container bg-slate-50 border border-slate-700/30 rounded-xl overflow-hidden flex flex-col">
+
+        <!-- HEADER BAR -->
+        <header class="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white px-5 py-2.5 flex justify-between items-center shadow-md shrink-0">
+            <!-- Branding Logo & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm border border-white/30 flex items-center justify-center">
+                    <i class="fa-solid fa-flask-vial text-2xl text-amber-200"></i>
+                </div>
+                <div>
+                    <h1 class="font-fredoka text-xl tracking-wide font-bold leading-tight flex items-center gap-2">
+                        LAB MAYA MATEMATIKA
+                        <span class="text-xs bg-amber-300 text-amber-950 font-sans font-extrabold px-2 py-0.5 rounded-full shadow-sm uppercase tracking-wider">SDN 2 Ubud</span>
+                    </h1>
+                    <p class="text-xs text-amber-100/90 font-medium">Materi: Rasio Satuan (Unit Rate) • Fase C Kelas 6</p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center space-x-2">
+                <!-- Audio Toggle Button -->
+                <button id="btn-audio" onclick="toggleAudio()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 active:scale-95 text-white px-3 py-1.5 rounded-lg text-xs font-semibold backdrop-blur-sm border border-white/20 transition-all cursor-pointer" title="Sembunyikan / Bunyikan Suara">
+                    <i id="audio-icon" class="fa-solid fa-volume-high text-amber-300 text-sm"></i>
+                    <span id="audio-label" class="hidden sm:inline">Suara: ON</span>
+                </button>
+
+                <!-- Global Reset Button -->
+                <button onclick="resetAll()" class="flex items-center gap-2 bg-rose-500 hover:bg-rose-600 active:scale-95 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow transition-all cursor-pointer border border-rose-400" title="Reset Semua Aktivitas">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Reset Lab</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- NAVIGATION TAB BAR -->
+        <nav class="bg-amber-100/80 border-b border-amber-200/80 px-4 py-1.5 flex justify-between items-center shrink-0">
+            <div class="flex space-x-1 sm:space-x-2 w-full justify-start overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('teori')" id="tab-btn-teori" class="tab-btn flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-150 cursor-pointer text-slate-600 hover:bg-amber-200/60">
+                    <i class="fa-solid fa-book-open"></i> 1. Teori
+                </button>
+                <button onclick="switchTab('prosedur')" id="tab-btn-prosedur" class="tab-btn flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-150 cursor-pointer text-slate-600 hover:bg-amber-200/60">
+                    <i class="fa-solid fa-list-check"></i> 2. Prosedur
+                </button>
+                <button onclick="switchTab('simulasi')" id="tab-btn-simulasi" class="tab-btn flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-150 cursor-pointer text-slate-600 hover:bg-amber-200/60">
+                    <i class="fa-solid fa-calculator"></i> 3. Simulasi Lab
+                </button>
+                <button onclick="switchTab('lkpd')" id="tab-btn-lkpd" class="tab-btn flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-150 cursor-pointer text-slate-600 hover:bg-amber-200/60">
+                    <i class="fa-solid fa-pen-to-square"></i> 4. LKPD Interaktif
+                </button>
+                <button onclick="switchTab('pengembang')" id="tab-btn-pengembang" class="tab-btn flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-150 cursor-pointer text-slate-600 hover:bg-amber-200/60">
+                    <i class="fa-solid fa-user-gear"></i> 5. Pengembang
+                </button>
+            </div>
+            <div class="hidden md:flex items-center gap-1.5 text-xs text-amber-800 font-semibold bg-amber-200/60 px-3 py-1 rounded-full whitespace-nowrap">
+                <i class="fa-solid fa-shop"></i> Context: Warung Ubud
+            </div>
+        </nav>
+
+        <!-- MAIN DISPLAY AREA (Container for 5 tabs) -->
+        <main class="flex-1 relative bg-slate-100 overflow-hidden p-4">
+
+            <!-- TAB 1: TEORI -->
+            <div id="tab-teori" class="tab-content h-full flex-col gap-3 custom-scroll overflow-y-auto">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center">
+                    <div class="flex-1">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-md uppercase">Konsep Dasar</span>
+                        <h2 class="font-fredoka text-2xl text-slate-800 mt-1 mb-2">Apa itu Rasio Satuan (Unit Rate)?</h2>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            <strong>Rasio Satuan</strong> adalah perbandingan antara dua kuantitas di mana <strong>kuantitas kedua bernilai tepat 1 unit</strong>. 
+                            Rasio satuan memudahkan kita membandingkan harga, kecepatan, atau efisiensi barang!
+                        </p>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 flex items-center gap-3 shrink-0">
+                        <div class="text-3xl text-amber-600"><i class="fa-solid fa-lightbulb"></i></div>
+                        <div class="text-xs text-amber-900 font-medium max-w-xs">
+                            <span class="font-bold">Rumus Utama:</span><br>
+                            <div class="bg-white px-2 py-1 rounded my-1 border border-amber-200 text-center font-mono font-bold text-amber-700">
+                                Rasio Satuan = Total Nilai ÷ Jumlah Unit
+                            </div>
+                            Contoh: Rp 12.000 untuk 3 jeruk = <strong>Rp 4.000 / 1 jeruk</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Concept Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
+                    <!-- Example Card 1 -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-amber-400 transition-all">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="fa-solid fa-basket-shopping text-orange-500"></i> Membandingkan Harga Jeruk Bali
+                                </h3>
+                                <span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-semibold">Toko Pasar Ubud</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3">Pak Wayan menjual <strong>5 kg Jeruk Bali</strong> seharga <strong>Rp 50.000</strong>. Berapa harga per 1 kg?</p>
+                            
+                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 flex items-center justify-between text-xs font-mono">
+                                <div>
+                                    <div class="text-slate-500">Hitungan:</div>
+                                    <div class="font-bold text-slate-700">Rp 50.000 ÷ 5 kg</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-slate-500">Rasio Satuan:</div>
+                                    <div class="font-bold text-emerald-600 text-sm">Rp 10.000 / kg</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-100 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>Dengan rasio satuan, kita tahu paket mana yang lebih murah!</span>
+                        </div>
+                    </div>
+
+                    <!-- Example Card 2 -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-amber-400 transition-all">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="fa-solid fa-hands-holding-circle text-teal-600"></i> Efisiensi Kerajinan Canang
+                                </h3>
+                                <span class="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full font-semibold">Sanggar Seni</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3">Kadek dapat merangkai <strong>24 Canang Sari</strong> dalam waktu <strong>3 jam</strong>. Berapa kecepatan Kadek per jam?</p>
+                            
+                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 flex items-center justify-between text-xs font-mono">
+                                <div>
+                                    <div class="text-slate-500">Hitungan:</div>
+                                    <div class="font-bold text-slate-700">24 Canang ÷ 3 Jam</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-slate-500">Rasio Satuan:</div>
+                                    <div class="font-bold text-teal-600 text-sm">8 Canang / Jam</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-xs text-teal-700 bg-teal-50 p-2 rounded border border-teal-100 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Rasio satuan juga berlaku untuk kecepatan produksi barang!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: PROSEDUR -->
+            <div id="tab-prosedur" class="tab-content h-full flex-col gap-3 custom-scroll overflow-y-auto">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <h2 class="font-fredoka text-2xl text-slate-800 mb-1">Langkah Mudah Menghitung Rasio Satuan</h2>
+                    <p class="text-xs text-slate-600">Ikuti 4 langkah sederhana berikut saat menggunakan laboratorium simulasi interaktif:</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 flex-1">
+                    <!-- Step 1 -->
+                    <div class="bg-white p-4 rounded-xl border-t-4 border-amber-500 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-8 h-8 rounded-full bg-amber-500 text-white font-fredoka font-bold flex items-center justify-center mb-3 text-lg">1</div>
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">Identifikasi Data</h3>
+                            <p class="text-xs text-slate-600">Tentukan total harga/nilai dan total kuantitas barang yang ditawarkan pada paket.</p>
+                        </div>
+                        <div class="bg-amber-50 p-2.5 rounded-lg text-xs text-amber-800 border border-amber-100 mt-2 font-mono">
+                            Contoh: Total Rp 15.000 untuk 3 Buku Saku Ubud.
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="bg-white p-4 rounded-xl border-t-4 border-blue-500 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white font-fredoka font-bold flex items-center justify-center mb-3 text-lg">2</div>
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">Gunakan Pembagian</h3>
+                            <p class="text-xs text-slate-600">Bagi nilai total dengan jumlah unit barang untuk mendapatkan harga 1 barang saja.</p>
+                        </div>
+                        <div class="bg-blue-50 p-2.5 rounded-lg text-xs text-blue-800 border border-blue-100 mt-2 font-mono">
+                            Rumus: 15.000 ÷ 3
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="bg-white p-4 rounded-xl border-t-4 border-emerald-500 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-8 h-8 rounded-full bg-emerald-500 text-white font-fredoka font-bold flex items-center justify-center mb-3 text-lg">3</div>
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">Dapatkan Rasio Satuan</h3>
+                            <p class="text-xs text-slate-600">Hasil pembagian adalah harga atau nilai spesifik per 1 unit tunggal (Unit Rate).</p>
+                        </div>
+                        <div class="bg-emerald-50 p-2.5 rounded-lg text-xs text-emerald-800 border border-emerald-100 mt-2 font-mono">
+                            Hasil: Rp 5.000 / 1 Buku
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="bg-white p-4 rounded-xl border-t-4 border-purple-500 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-8 h-8 rounded-full bg-purple-500 text-white font-fredoka font-bold flex items-center justify-center mb-3 text-lg">4</div>
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">Bandingkan Hematnya</h3>
+                            <p class="text-xs text-slate-600">Bandingkan nilai per unit dari dua opsi untuk memilih yang lebih ekonomis/hemat!</p>
+                        </div>
+                        <div class="bg-purple-50 p-2.5 rounded-lg text-xs text-purple-800 border border-purple-100 mt-2 font-mono">
+                            Pilih nilai per unit yang paling MURAH.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: SIMULASI INTERAKTIF -->
+            <div id="tab-simulasi" class="tab-content h-full flex-col gap-3">
+                
+                <!-- Mode Switcher -->
+                <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center shrink-0">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Mode Lab:</span>
+                        <div class="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200">
+                            <button id="sim-mode-1" onclick="setSimMode('paket')" class="px-3 py-1 rounded-md text-xs font-bold transition-all bg-amber-500 text-white shadow-sm">
+                                <i class="fa-solid fa-boxes-packing mr-1"></i> Perbandingan Paket Hemat
+                            </button>
+                            <button id="sim-mode-2" onclick="setSimMode('kecepatan')" class="px-3 py-1 rounded-md text-xs font-bold transition-all text-slate-600 hover:text-slate-900">
+                                <i class="fa-solid fa-gauge-high mr-1"></i> Kecepatan & Produksi
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-500">
+                        <i class="fa-solid fa-sliders text-amber-500 mr-1"></i> Geser slider / ubah angka untuk melihat hasil rasio otomatis!
+                    </div>
+                </div>
+
+                <!-- SIMULATION AREA CONTAINER -->
+                <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-3 overflow-hidden">
+                    
+                    <!-- PACKAGE A / SCENARIO A CARD -->
+                    <div class="bg-white rounded-xl border-2 border-amber-300 p-3.5 flex flex-col justify-between shadow-sm relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-amber-100 rounded-full opacity-50 pointer-events-none"></div>
+                        
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="bg-amber-500 text-white font-fredoka px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider">
+                                    <span id="label-option-a">OPSI A (Paket Kuning)</span>
+                                </span>
+                                <span id="badge-item-a" class="text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-md">
+                                    Jeruk Bali Ubud
+                                </span>
+                            </div>
+
+                            <!-- Visual Stack Display Area -->
+                            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 min-h-[110px] flex flex-col items-center justify-center relative">
+                                <div id="visual-stack-a" class="flex flex-wrap items-center justify-center gap-2 max-h-[80px] overflow-y-auto p-1">
+                                    <!-- Dynamic icons generated via JS -->
+                                </div>
+                                <div class="mt-2 text-xs text-slate-500 font-medium">
+                                    Total: <span id="visual-qty-a-text" class="font-bold text-slate-800">5 Item</span>
+                                </div>
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="mt-3 space-y-2">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-600 font-semibold" id="slider-label-1a">Jumlah Barang (Unit):</span>
+                                        <span id="val-qty-a" class="font-bold font-mono text-amber-700">5</span>
+                                    </div>
+                                    <input type="range" id="input-qty-a" min="1" max="20" value="5" oninput="updateSim()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-600 font-semibold" id="slider-label-2a">Total Harga (Rp):</span>
+                                        <span id="val-price-a" class="font-bold font-mono text-amber-700">Rp 45.000</span>
+                                    </div>
+                                    <input type="range" id="input-price-a" min="5000" max="100000" step="1000" value="45000" oninput="updateSim()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Unit Rate Calculated Result Box -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2">
+                            <div class="text-[11px] text-amber-800 uppercase font-bold tracking-wider mb-1 flex justify-between">
+                                <span>Perhitungan Rasio Satuan A</span>
+                                <i class="fa-solid fa-calculator text-amber-600"></i>
+                            </div>
+                            <div class="flex items-center justify-between text-xs font-mono bg-white p-2 rounded-lg border border-amber-200">
+                                <span id="calc-formula-a" class="text-slate-600">45.000 ÷ 5</span>
+                                <span class="font-bold text-amber-700 text-sm" id="calc-rate-a">Rp 9.000 / unit</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PACKAGE B / SCENARIO B CARD -->
+                    <div class="bg-white rounded-xl border-2 border-indigo-300 p-3.5 flex flex-col justify-between shadow-sm relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-indigo-100 rounded-full opacity-50 pointer-events-none"></div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="bg-indigo-600 text-white font-fredoka px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider">
+                                    <span id="label-option-b">OPSI B (Paket Biru)</span>
+                                </span>
+                                <span id="badge-item-b" class="text-xs font-bold bg-indigo-50 text-indigo-800 border border-indigo-200 px-2 py-0.5 rounded-md">
+                                    Jeruk Bali Ubud
+                                </span>
+                            </div>
+
+                            <!-- Visual Stack Display Area -->
+                            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 min-h-[110px] flex flex-col items-center justify-center relative">
+                                <div id="visual-stack-b" class="flex flex-wrap items-center justify-center gap-2 max-h-[80px] overflow-y-auto p-1">
+                                    <!-- Dynamic icons generated via JS -->
+                                </div>
+                                <div class="mt-2 text-xs text-slate-500 font-medium">
+                                    Total: <span id="visual-qty-b-text" class="font-bold text-slate-800">8 Item</span>
+                                </div>
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="mt-3 space-y-2">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-600 font-semibold" id="slider-label-1b">Jumlah Barang (Unit):</span>
+                                        <span id="val-qty-b" class="font-bold font-mono text-indigo-700">8</span>
+                                    </div>
+                                    <input type="range" id="input-qty-b" min="1" max="20" value="8" oninput="updateSim()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-600 font-semibold" id="slider-label-2b">Total Harga (Rp):</span>
+                                        <span id="val-price-b" class="font-bold font-mono text-indigo-700">Rp 64.000</span>
+                                    </div>
+                                    <input type="range" id="input-price-b" min="5000" max="100000" step="1000" value="64000" oninput="updateSim()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Unit Rate Calculated Result Box -->
+                        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 mt-2">
+                            <div class="text-[11px] text-indigo-800 uppercase font-bold tracking-wider mb-1 flex justify-between">
+                                <span>Perhitungan Rasio Satuan B</span>
+                                <i class="fa-solid fa-calculator text-indigo-600"></i>
+                            </div>
+                            <div class="flex items-center justify-between text-xs font-mono bg-white p-2 rounded-lg border border-indigo-200">
+                                <span id="calc-formula-b" class="text-slate-600">64.000 ÷ 8</span>
+                                <span class="font-bold text-indigo-700 text-sm" id="calc-rate-b">Rp 8.000 / unit</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SIMULATION COMPARISON SUMMARY BANNER -->
+                <div id="comparison-summary" class="bg-slate-800 text-white p-3 rounded-xl flex items-center justify-between shadow-md border border-slate-700 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-amber-500 rounded-lg text-white font-bold text-lg">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-amber-300 font-semibold uppercase tracking-wider">Kesimpulan Perbandingan:</div>
+                            <div id="summary-text" class="text-xs sm:text-sm font-medium">
+                                Opsi B lebih murah Rp 1.000 / unit dibanding Opsi A!
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="playWinSound()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition-all shadow active:scale-95">
+                        <i class="fa-solid fa-thumbs-up mr-1"></i> Rekomendasi
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- TAB 4: LKPD INTERAKTIF (WORKSHEET) -->
+            <div id="tab-lkpd" class="tab-content h-full flex-col gap-3 custom-scroll overflow-y-auto">
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+                    <div>
+                        <h2 class="font-fredoka text-xl text-slate-800">Lembar Kerja Peserta Didik (LKPD) Interaktif</h2>
+                        <p class="text-xs text-slate-600">Selesaikan soal rasio satuan di bawah ini untuk menguji pemahamanmu!</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200">
+                        <span class="text-xs font-bold text-amber-800">Skor Kamu:</span>
+                        <span id="score-display" class="font-fredoka text-xl text-amber-600">0 / 30</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3 flex-1">
+                    <!-- Quiz Item 1 -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-start gap-2 mb-2">
+                            <span class="bg-amber-500 text-white font-bold text-xs px-2 py-0.5 rounded">Soal 1</span>
+                            <p class="text-xs text-slate-800 font-semibold leading-relaxed">
+                                Toko Souvenir Tebesaya menjual <strong>6 gantungan kunci kayu Ubud</strong> seharga <strong>Rp 30.000</strong>. Berapakah rasio satuan (harga per 1 gantungan kunci)?
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">
+                            <button onclick="checkAnswer(1, 5000, this)" class="quiz-btn-1 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                Rp 4.000 / buah
+                            </button>
+                            <button onclick="checkAnswer(1, 1, this)" class="quiz-btn-1 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                Rp 5.000 / buah
+                            </button>
+                            <button onclick="checkAnswer(1, 6000, this)" class="quiz-btn-1 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                Rp 6.000 / buah
+                            </button>
+                            <button onclick="checkAnswer(1, 8000, this)" class="quiz-btn-1 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                Rp 7.000 / buah
+                            </button>
+                        </div>
+                        <div id="feedback-1" class="hidden mt-2 text-xs p-2 rounded-lg font-medium"></div>
+                    </div>
+
+                    <!-- Quiz Item 2 -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-start gap-2 mb-2">
+                            <span class="bg-amber-500 text-white font-bold text-xs px-2 py-0.5 rounded">Soal 2</span>
+                            <p class="text-xs text-slate-800 font-semibold leading-relaxed">
+                                Paket A: Rp 24.000 untuk 4 Pensil.<br>
+                                Paket B: Rp 18.000 untuk 3 Pensil.<br>
+                                Manakah paket pensil yang harga satuannya <strong>LEBIH HEMAT</strong>?
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">
+                            <button onclick="checkAnswer(2, 'A', this)" class="quiz-btn-2 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                Paket A Lebih Hemat
+                            </button>
+                            <button onclick="checkAnswer(2, 'B', this)" class="quiz-btn-2 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                Paket B Lebih Hemat
+                            </button>
+                            <button onclick="checkAnswer(2, 'SAME', this)" class="quiz-btn-2 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                Sama Hematnya (Rp 6.000 / pensil)
+                            </button>
+                        </div>
+                        <div id="feedback-2" class="hidden mt-2 text-xs p-2 rounded-lg font-medium"></div>
+                    </div>
+
+                    <!-- Quiz Item 3 -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-start gap-2 mb-2">
+                            <span class="bg-amber-500 text-white font-bold text-xs px-2 py-0.5 rounded">Soal 3</span>
+                            <p class="text-xs text-slate-800 font-semibold leading-relaxed">
+                                Sebuah sepeda motor menempuh jarak <strong>90 km</strong> dengan menghabiskan <strong>2 liter bensin</strong>. Berapakah rasio satuan jarak per liter bensin?
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">
+                            <button onclick="checkAnswer(3, 40, this)" class="quiz-btn-3 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                40 km / liter
+                            </button>
+                            <button onclick="checkAnswer(3, 45, this)" class="quiz-btn-3 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                45 km / liter
+                            </button>
+                            <button onclick="checkAnswer(3, 50, this)" class="quiz-btn-3 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                50 km / liter
+                            </button>
+                            <button onclick="checkAnswer(3, 60, this)" class="quiz-btn-3 border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center">
+                                60 km / liter
+                            </button>
+                        </div>
+                        <div id="feedback-3" class="hidden mt-2 text-xs p-2 rounded-lg font-medium"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: PENGEMBANG -->
+            <div id="tab-pengembang" class="tab-content h-full flex-col gap-3 custom-scroll overflow-y-auto">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm max-w-3xl mx-auto w-full">
+                    <div class="flex items-center gap-4 mb-4 pb-3 border-b border-slate-100">
+                        <div class="w-16 h-16 bg-gradient-to-tr from-amber-500 to-orange-500 rounded-full flex items-center justify-center text-white text-2xl shadow-md font-bold">
+                            SD2
+                        </div>
+                        <div>
+                            <h2 class="font-fredoka text-2xl text-slate-800">Tim Pengembang Lab Maya</h2>
+                            <p class="text-xs text-amber-700 font-semibold">SD State No. 2 Ubud (SDN 2 Ubud) • Gianyar, Bali</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600">
+                        <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 space-y-2">
+                            <div class="font-bold text-slate-800 text-sm border-b border-slate-200 pb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-graduation-cap text-amber-600"></i> Informasi Kurikulum
+                            </div>
+                            <p><strong>Mata Pelajaran:</strong> Matematika</p>
+                            <p><strong>Fase / Kelas:</strong> Fase C / Kelas 6 SD</p>
+                            <p><strong>Elemen:</strong> Rasio & Perbandingan Satuan</p>
+                            <p><strong>Capaian Pembelajaran:</strong> Peserta didik dapat membandingkan dua kuantitas dan menentukan rasio satuan dalam kehidupan sehari-hari.</p>
+                        </div>
+
+                        <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 space-y-2">
+                            <div class="font-bold text-slate-800 text-sm border-b border-slate-200 pb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-code text-amber-600"></i> Spesifikasi Teknis Lab
+                            </div>
+                            <p><strong>Platform:</strong> HTML5 Web Interactive Virtual Lab</p>
+                            <p><strong>Tampilan:</strong> Fixed 16:9 Aspect Ratio (Full Screen No-Scroll)</p>
+                            <p><strong>Audio Synthesizer:</strong> Web Audio API (Zero External Dependency)</p>
+                            <p><strong>Pengembang:</strong> Tim Guru Matematika Kelas 6 SDN 2 Ubud</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-amber-50 p-3 rounded-lg border border-amber-200 text-xs text-amber-900 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-heart text-rose-500 text-sm"></i>
+                            <span>Didedikasikan untuk pembelajaran interaktif dan menyenangkan siswa-siswi SDN 2 Ubud.</span>
+                        </div>
+                        <span class="font-mono text-[10px] text-amber-700 font-bold">v2.5 - 2026</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- FOOTER BAR -->
+        <footer class="bg-slate-800 text-slate-400 px-5 py-1.5 text-[11px] flex justify-between items-center shrink-0 border-t border-slate-700">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Status Lab: <strong class="text-slate-200">Aktif & Siap Digunakan</strong></span>
+            </div>
+            <div>
+                © SDN 2 Ubud • Lab Maya Interaktif Matematika
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // GLOBAL STATE
+        let isMuted = false;
+        let activeTab = 'teori';
+        let currentSimMode = 'paket'; // 'paket' or 'kecepatan'
+        let currentScore = 0;
+        let quizAnswered = { 1: false, 2: false, 3: false };
+
+        // AUDIO SYNTHESIZER (Web Audio API - Sound FX without external files)
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+        }
+
+        function playBeep(freq = 440, type = 'sine', duration = 0.1) {
+            if (isMuted) return;
+            try {
+                initAudio();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log("Audio not allowed yet");
+            }
+        }
+
+        function playClickSound() {
+            playBeep(600, 'sine', 0.08);
+        }
+
+        function playWinSound() {
+            if (isMuted) return;
+            initAudio();
+            const now = audioCtx.currentTime;
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                setTimeout(() => playBeep(freq, 'triangle', 0.2), idx * 100);
+            });
+        }
+
+        function playWrongSound() {
+            if (isMuted) return;
+            playBeep(220, 'sawtooth', 0.25);
+        }
+
+        function toggleAudio() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('audio-icon');
+            const label = document.getElementById('audio-label');
+            if (isMuted) {
+                icon.className = 'fa-solid fa-volume-xmark text-rose-300 text-sm';
+                label.innerText = 'Suara: OFF';
+            } else {
+                icon.className = 'fa-solid fa-volume-high text-amber-300 text-sm';
+                label.innerText = 'Suara: ON';
+                playBeep(800, 'sine', 0.1);
+            }
+        }
+
+        // TAB SWITCHING LOGIC
+        function switchTab(tabId) {
+            playClickSound();
+            activeTab = tabId;
+
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // Reset tab button styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-white', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+
+            // Activate chosen tab
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) targetTab.classList.add('active');
+
+            const targetBtn = document.getElementById('tab-btn-' + tabId);
+            if (targetBtn) {
+                targetBtn.classList.add('bg-amber-500', 'text-white', 'shadow-sm');
+                targetBtn.classList.remove('text-slate-600');
+            }
+
+            if (tabId === 'simulasi') {
+                updateSim();
+            }
+        }
+
+        // SIMULATION MODE SWITCHER
+        function setSimMode(mode) {
+            playClickSound();
+            currentSimMode = mode;
+
+            const btn1 = document.getElementById('sim-mode-1');
+            const btn2 = document.getElementById('sim-mode-2');
+
+            if (mode === 'paket') {
+                btn1.className = 'px-3 py-1 rounded-md text-xs font-bold transition-all bg-amber-500 text-white shadow-sm';
+                btn2.className = 'px-3 py-1 rounded-md text-xs font-bold transition-all text-slate-600 hover:text-slate-900';
+
+                // Labels for Package mode
+                document.getElementById('label-option-a').innerText = 'OPSI A (Paket Kuning)';
+                document.getElementById('label-option-b').innerText = 'OPSI B (Paket Biru)';
+                document.getElementById('badge-item-a').innerText = 'Jeruk Bali Ubud';
+                document.getElementById('badge-item-b').innerText = 'Jeruk Bali Ubud';
+
+                document.getElementById('slider-label-1a').innerText = 'Jumlah Barang (Unit):';
+                document.getElementById('slider-label-1b').innerText = 'Jumlah Barang (Unit):';
+                document.getElementById('slider-label-2a').innerText = 'Total Harga (Rp):';
+                document.getElementById('slider-label-2b').innerText = 'Total Harga (Rp):';
+
+                // Reset defaults for Mode A
+                document.getElementById('input-qty-a').value = 5;
+                document.getElementById('input-price-a').value = 45000;
+                document.getElementById('input-qty-b').value = 8;
+                document.getElementById('input-price-b').value = 64000;
+            } else {
+                btn2.className = 'px-3 py-1 rounded-md text-xs font-bold transition-all bg-amber-500 text-white shadow-sm';
+                btn1.className = 'px-3 py-1 rounded-md text-xs font-bold transition-all text-slate-600 hover:text-slate-900';
+
+                // Labels for Speed/Production mode
+                document.getElementById('label-option-a').innerText = 'Pengrajin Wayan';
+                document.getElementById('label-option-b').innerText = 'Pengrajin Made';
+                document.getElementById('badge-item-a').innerText = 'Produksi Canang';
+                document.getElementById('badge-item-b').innerText = 'Produksi Canang';
+
+                document.getElementById('slider-label-1a').innerText = 'Waktu Kerja (Jam):';
+                document.getElementById('slider-label-1b').innerText = 'Waktu Kerja (Jam):';
+                document.getElementById('slider-label-2a').innerText = 'Hasil Produksi (Buah):';
+                document.getElementById('slider-label-2b').innerText = 'Hasil Produksi (Buah):';
+
+                // Reset defaults for Mode B
+                document.getElementById('input-qty-a').value = 3;
+                document.getElementById('input-price-a').value = 24; // Used as total production count
+                document.getElementById('input-qty-b').value = 5;
+                document.getElementById('input-price-b').value = 35;
+            }
+
+            updateSim();
+        }
+
+        // SIMULATION CALCULATOR & VISUALIZER ENGINE
+        function updateSim() {
+            playBeep(400, 'sine', 0.03);
+
+            const qtyA = parseInt(document.getElementById('input-qty-a').value);
+            const priceA = parseInt(document.getElementById('input-price-a').value);
+
+            const qtyB = parseInt(document.getElementById('input-qty-b').value);
+            const priceB = parseInt(document.getElementById('input-price-b').value);
+
+            // Update label UI values
+            document.getElementById('val-qty-a').innerText = qtyA;
+            document.getElementById('val-qty-b').innerText = qtyB;
+
+            document.getElementById('visual-qty-a-text').innerText = qtyA + (currentSimMode === 'paket' ? ' Unit' : ' Jam');
+            document.getElementById('visual-qty-b-text').innerText = qtyB + (currentSimMode === 'paket' ? ' Unit' : ' Jam');
+
+            const rateA = priceA / qtyA;
+            const rateB = priceB / qtyB;
+
+            if (currentSimMode === 'paket') {
+                document.getElementById('val-price-a').innerText = 'Rp ' + priceA.toLocaleString('id-ID');
+                document.getElementById('val-price-b').innerText = 'Rp ' + priceB.toLocaleString('id-ID');
+
+                document.getElementById('calc-formula-a').innerText = `${priceA.toLocaleString('id-ID')} ÷ ${qtyA}`;
+                document.getElementById('calc-rate-a').innerText = `Rp ${Math.round(rateA).toLocaleString('id-ID')} / unit`;
+
+                document.getElementById('calc-formula-b').innerText = `${priceB.toLocaleString('id-ID')} ÷ ${qtyB}`;
+                document.getElementById('calc-rate-b').innerText = `Rp ${Math.round(rateB).toLocaleString('id-ID')} / unit`;
+
+                // Comparison Summary
+                const diff = Math.abs(Math.round(rateA - rateB));
+                const summaryEl = document.getElementById('summary-text');
+                if (Math.round(rateA) === Math.round(rateB)) {
+                    summaryEl.innerHTML = `Kedua paket memiliki harga satuan <strong>SAMA HEMAT</strong> (Rp ${Math.round(rateA).toLocaleString('id-ID')} / unit).`;
+                } else if (rateA < rateB) {
+                    summaryEl.innerHTML = `<strong>OPSI A (Kuning) LEBIH HEMAT!</strong> Lebih murah Rp ${diff.toLocaleString('id-ID')} / unit dibanding Opsi B.`;
+                } else {
+                    summaryEl.innerHTML = `<strong>OPSI B (Biru) LEBIH HEMAT!</strong> Lebih murah Rp ${diff.toLocaleString('id-ID')} / unit dibanding Opsi A.`;
+                }
+            } else {
+                // Production / Speed mode
+                document.getElementById('val-price-a').innerText = priceA + ' Canang';
+                document.getElementById('val-price-b').innerText = priceB + ' Canang';
+
+                document.getElementById('calc-formula-a').innerText = `${priceA} Canang ÷ ${qtyA} Jam`;
+                document.getElementById('calc-rate-a').innerText = `${(priceA / qtyA).toFixed(1)} Canang / jam`;
+
+                document.getElementById('calc-formula-b').innerText = `${priceB} Canang ÷ ${qtyB} Jam`;
+                document.getElementById('calc-rate-b').innerText = `${(priceB / qtyB).toFixed(1)} Canang / jam`;
+
+                const summaryEl = document.getElementById('summary-text');
+                const rateAVal = priceA / qtyA;
+                const rateBVal = priceB / qtyB;
+
+                if (rateAVal.toFixed(1) === rateBVal.toFixed(1)) {
+                    summaryEl.innerHTML = `Kecepatan produksi Wayan dan Made <strong>SAMA CEPAT</strong> (${rateAVal.toFixed(1)} Canang / jam).`;
+                } else if (rateAVal > rateBVal) {
+                    summaryEl.innerHTML = `<strong>Wayan (Opsi A) LEBIH CEPT!</strong> Merangkai ${(rateAVal - rateBVal).toFixed(1)} Canang lebih banyak per jam.`;
+                } else {
+                    summaryEl.innerHTML = `<strong>Made (Opsi B) LEBIH CEPAT!</strong> Merangkai ${(rateBVal - rateAVal).toFixed(1)} Canang lebih banyak per jam.`;
+                }
+            }
+
+            // Render Dynamic Visual Icon Stacks
+            renderVisualStack('visual-stack-a', qtyA, currentSimMode === 'paket' ? 'fa-lemon text-amber-500' : 'fa-hand-holding-heart text-amber-600');
+            renderVisualStack('visual-stack-b', qtyB, currentSimMode === 'paket' ? 'fa-lemon text-indigo-500' : 'fa-hand-holding-heart text-indigo-600');
+        }
+
+        function renderVisualStack(elementId, count, iconClass) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            const displayCount = Math.min(count, 20); // Cap visual icons for clean layout
+
+            for (let i = 0; i < displayCount; i++) {
+                const icon = document.createElement('i');
+                icon.className = `fa-solid ${iconClass} text-xl animate-pulse-subtle`;
+                container.appendChild(icon);
+            }
+        }
+
+        // LKPD QUIZ CHECKER
+        function checkAnswer(questionNum, answer, btnElement) {
+            if (quizAnswered[questionNum]) return; // Prevent multiple attempts
+
+            const feedbackEl = document.getElementById('feedback-' + questionNum);
+            feedbackEl.classList.remove('hidden');
+
+            let isCorrect = false;
+
+            if (questionNum === 1 && answer === 1) { // Rp 5.000 / buah
+                isCorrect = true;
+            } else if (questionNum === 2 && answer === 'SAME') { // Both Rp 6.000
+                isCorrect = true;
+            } else if (questionNum === 3 && answer === 45) { // 45 km/l
+                isCorrect = true;
+            }
+
+            // Disable buttons in this question group
+            document.querySelectorAll(`.quiz-btn-${questionNum}`).forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-60', 'cursor-not-allowed');
+            });
+
+            if (isCorrect) {
+                playWinSound();
+                btnElement.classList.remove('bg-slate-50', 'text-slate-700');
+                btnElement.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
+                feedbackEl.className = 'mt-2 text-xs p-2 rounded-lg font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+                feedbackEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Bener Pisan! Jawaban kamu tepat sekali (+10 Poin).';
+                currentScore += 10;
+            } else {
+                playWrongSound();
+                btnElement.classList.remove('bg-slate-50', 'text-slate-700');
+                btnElement.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
+                feedbackEl.className = 'mt-2 text-xs p-2 rounded-lg font-bold bg-rose-100 text-rose-800 border border-rose-300';
+                feedbackEl.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> Kurang tepat. Coba periksa kembali pembagian nilai total ÷ jumlah unitnya ya!';
+            }
+
+            quizAnswered[questionNum] = true;
+            document.getElementById('score-display').innerText = `${currentScore} / 30`;
+        }
+
+        // RESET ALL ACTIVITES
+        function resetAll() {
+            playWrongSound();
+
+            // Reset Quiz
+            currentScore = 0;
+            quizAnswered = { 1: false, 2: false, 3: false };
+            document.getElementById('score-display').innerText = '0 / 30';
+
+            for (let i = 1; i <= 3; i++) {
+                const feedbackEl = document.getElementById('feedback-' + i);
+                if (feedbackEl) {
+                    feedbackEl.classList.add('hidden');
+                    feedbackEl.innerText = '';
+                }
+                document.querySelectorAll(`.quiz-btn-${i}`).forEach(btn => {
+                    btn.disabled = false;
+                    btn.className = `quiz-btn-${i} border border-slate-200 hover:border-amber-400 p-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 transition-all text-center`;
+                });
+            }
+
+            // Reset Simulation to default
+            setSimMode('paket');
+            switchTab('teori');
+        }
+
+        // INIT ON LOAD
+        window.onload = function() {
+            switchTab('teori');
+        };
+    </script>
+</body>
+</html>
